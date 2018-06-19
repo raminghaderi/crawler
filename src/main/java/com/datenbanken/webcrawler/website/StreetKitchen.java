@@ -8,32 +8,30 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
  *
  * @author ramin
  */
-public class Yogi {
+public class StreetKitchen {
 
     private static final int RESTAURANT_ID = 1;
 
     public static void crwal() throws IOException, SQLException {
 
         List<Meal> meals = new ArrayList<>();
-        Document document = Jsoup.connect("http://lieferservice.yogi-restaurant.de/").get();
-        Elements elements = document.select(".wppizza-article-vorspeisen-36");
+        Document document = Jsoup.connect("http://streetkitchen-viet-cuisine.de/").get();
+        Elements elements = document.select(".media .media-body");
         elements.forEach(element -> {
-            Element e = element.selectFirst(".wppizza-article-info h2");
-            e.child(0).remove();
-            String mealName = e.text();
-            String mealIngredient = element.selectFirst(".wppizza-article-info p").text();
-            float mealPrice = Float.valueOf(element.select(".wppizza-article-price span").text().replace(",", "."));
+            String name = element.selectFirst("h3").text();
+            String mealName = name.substring(name.lastIndexOf(".") + 2);
+            String mealIngredient = element.selectFirst("p:nth-child(3)").text();
+            String price = element.selectFirst("p.price").text();
+            float mealPrice = Float.valueOf(price.substring(0, 4));
             Meal meal = new Meal(RESTAURANT_ID, mealName, mealIngredient, mealPrice);
             meals.add(meal);
         });
-//        MealRepository.update(meals, RESTAURANT_ID);
         MealRepository mealRepository = new MealRepository();
         mealRepository.update(meals, RESTAURANT_ID);
     }
